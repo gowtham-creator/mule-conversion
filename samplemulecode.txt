@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http-policy="http://www.mulesoft.org/schema/mule/http-policy"
+      xmlns:http-transform="http://www.mulesoft.org/schema/mule/http-policy-transform"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http-policy http://www.mulesoft.org/schema/mule/http-policy/current/mule-http-policy.xsd
+               http://www.mulesoft.org/schema/mule/http-policy-transform http://www.mulesoft.org/schema/mule/http-policy-transform/current/mule-http-policy-transform.xsd">
+
+    <http-policy:proxy name="{{{policyId}}}-custom-policy">
+        <http-policy:source>
+
+            {{#if evaluateInRequest}}
+            <try>
+                <set-variable variableName="requestConditionMet" value="{{{requestCondition}}}"/>
+                <error-handler>
+                    <on-error-continue type="EXPRESSION"/>
+                </error-handler>
+            </try>
+            {{/if}}
+            
+            <http-policy:execute-next/>
+            
+            {{#if evaluateInResponse}}
+            <try>
+                <set-variable variableName="responseConditionMet" value="{{{responseCondition}}}"/>
+                <error-handler>
+                    <on-error-continue type="EXPRESSION"/>
+                </error-handler>
+            </try>
+            {{/if}}
+
+            <choice>
+                <when expression="#[
+                    (vars.requestConditionMet default false) 
+                        {{#if mergeBothConditions}} and {{else}} or {{/if}}
+                    (vars.responseConditionMet default false)]" >
+                                    
+                    <http-transform:set-response statusCode="#[
+                            {{#if statusCode}}
+                                {{{statusCode}}}
+                            {{else}}
+                                attributes.statusCode
+                            {{/if}}]">
+                        {{#if payload}}
+                        <http-transform:body>{{{payload}}}</http-transform:body>
+                        {{/if}}
+                        <http-transform:headers>#[attributes.headers]</http-transform:headers>
+                    </http-transform:set-response>
+                </when>
+            </choice>
+
+        </http-policy:source>
+    </http-policy:proxy>
+</mule>

@@ -7,8 +7,11 @@ from datetime import datetime
 # Load environment variables and initialize LLM
 load_dotenv()
 llm = AzureChatOpenAI(
-    model="gpt-4o",
-    api_version="2024-05-01-preview",
+    azure_endpoint="https://mule-openai-service.openai.azure.com/",
+    api_key="DKxrbjZBwBTqECc0AiksKFAdwgNYHW5F6S8ZB1gNdbGjxfUYvUCQJQQJ99BDACYeBjFXJ3w3AAABACOGCrVm",
+    deployment_name="gpt-4o",  # <--- This is your Deployment Name!
+    model="gpt-4o",                      # <--- This is the actual model type.
+    api_version="2024-02-15-preview",
     temperature=0,
 )
 

@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 from langchain_openai import AzureChatOpenAI #type:ignore
 from dotenv import load_dotenv #type:ignore
 import time
@@ -7,11 +8,10 @@ from datetime import datetime
 # Load environment variables and initialize LLM
 load_dotenv()
 llm = AzureChatOpenAI(
-    azure_endpoint="https://mule-openai-service.openai.azure.com/",
-    api_key="DKxrbjZBwBTqECc0AiksKFAdwgNYHW5F6S8ZB1gNdbGjxfUYvUCQJQQJ99BDACYeBjFXJ3w3AAABACOGCrVm",
-    deployment_name="gpt-4o",  # <--- This is your Deployment Name!
-    model="gpt-4o",                      # <--- This is the actual model type.
-    api_version="2024-02-15-preview",
+    model="gpt-4o",
+    api_version="2024-05-01-preview",
+    api_key= os.getenv("AZURE_OPENAI_API_KEY"),
+    azure_endpoint= os.getenv("AZURE_OPENAI_ENDPOINT"),
     temperature=0,
 )
 
